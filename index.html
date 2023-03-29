@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>The Meth Run</title>
+	<style>
+		canvas {
+			border: 1px solid black;
+			background-color: #b5d0e8;
+		}
+	</style>
+</head>
+<body>
+	<div id="startScreen" style="position:absolute;left:50;top:0;width:100%;height:100%;background-color:black;color:white;text-align:center;">
+		<h1>The Meth Run</h1>
+		<p>Avoid the drugs. Save Mr. Cook.</p>
+		<button onclick="startGame()">Start Game</button>
+	</div>
+
+	<canvas id="gameCanvas" width="800" height="600" style="display:none;"></canvas>
+
+	<script>
+		// Load player image
+		const playerImage = new Image();
+		playerImage.src = "https://media.discordapp.net/attachments/989983428244045875/1089729937272999986/Player.gif";
+
+		// Load obstacle image
+		const obstacleImage = new Image();
+		obstacleImage.src = "https://www.sbhservices.org/sites/default/files/drugfreeazkids/uploads/meth.png";
+
+		// Game variables
+		let score = 0;
+		let playerX = 100;
+		let playerY = 450;
+		let obstacleX = 800;
+		let obstacleY = 470;
+		let obstacleSpeed = 5;
+		let obstacleWidth = 100;
+		let obstacleHeight = 100;
+		let isGameOver = false;
+
+		// Get canvas context
+		const canvas = document.getElementById("gameCanvas");
+		const context = canvas.getContext("2d");
+
+		// Update function - called every frame
+		function update() {
+			// Clear canvas
+			context.clearRect(0, 0, canvas.width, canvas.height);
+
+			// Draw background
+			context.fillStyle = "#b5d0e8";
+			context.fillRect(0, 0, canvas.width, canvas.height);
+
+			// Draw player image
+			context.drawImage(playerImage, playerX, playerY);
+
+			// Draw obstacle image
+			context.drawImage(obstacleImage, obstacleX, obstacleY, obstacleWidth, obstacleHeight);
+
+			// Move obstacle left
+			obstacleX -= obstacleSpeed;
+
+			// Check for collision with player
+			if (playerX < obstacleX + obstacleWidth && playerX + 50 > obstacleX && playerY < obstacleY + obstacleHeight && playerY + 50 > obstacleY) {
+				isGameOver = true;
+			}
+
+			// Check if obstacle has gone off the left side of the screen
+			if (obstacleX < -obstacleWidth) {
+				// Respawn obstacle at right side of screen
+				obstacleX = canvas.width;
+				obstacleY = Math.random() * (canvas.height - obstacleHeight);
+				// Increase score
+				score++;
+				// Increase obstacle speed
+				obstacleSpeed += 0.5;
+			}
+
+			// Draw score text
+			context.fillStyle = "black";
+			context.font = "24px Arial";
+			context.fillText("Score: " + score, 10, 30);
+
+			// Draw game over text if player dies
+			if (isGameOver) {
+				context.fillText("Sorry, you died. Try again.", canvas.width/2 - 120, canvas.height/2);
+			} else {
+				// Schedule next update
+				window.requestAnimationFrame(update);
+			}
+		}
+
+		// Handle player movement
+		// Handle player movement
+		function handlePlayerMove(x, y) {
+			playerX = x - 25; // Subtract half of player width to center on touch position
+			playerY = y - 25; // Subtract half of player height to center on touch position
+		}
+
+		// Start game function - called when player clicks "Start Game" button
+		function startGame() {
+			// Hide start screen and show canvas
+			document.getElementById("startScreen").style.display = "none";
+			canvas.style.display = "block";
+//keyfunction
+      document.addEventListener("keydown", function(e) {
+	if (e.key === "ArrowUp") {
+		playerY -= 10;
+	} else if (e.key === "ArrowDown") {
+		playerY += 10;
+	} else if (e.key === "ArrowLeft") {
+		playerX -= 10;
+	} else if (e.key === "ArrowRight") {
+		playerX += 10;
+	}
+});
+
+			// Add touch event listeners
+			canvas.addEventListener("touchstart", function(e) {
+				handlePlayerMove(e.touches[0].clientX, e.touches[0].clientY);
+			});
+
+			canvas.addEventListener("touchmove", function(e) {
+				handlePlayerMove(e.touches[0].clientX, e.touches[0].clientY);
+			});
+function handlePlayerMove(x, y) {
+	playerX = x - 25; // Subtract half of player width to center on touch position
+	playerY = y - 25; // Subtract half of player height to center on touch position
+}
+
+function handleArrowMove(direction) {
+	if (direction === "up") {
+		playerY -= 10;
+	} else if (direction === "down") {
+		playerY += 10;
+	} else if (direction === "left") {
+		playerX -= 10;
+	} else if (direction === "right") {
+		playerX += 10;
+	}
+}
+document.addEventListener("keydown", function(e) {
+	if (e.key === "ArrowUp") {
+		handleArrowMove("up");
+	} else if (e.key === "ArrowDown") {
+		handleArrowMove("down");
+	} else if (e.key === "ArrowLeft") {
+		handleArrowMove("left");
+	} else if (e.key === "ArrowRight") {
+		handleArrowMove("right");
+	}
+});
+
+			// Start update loop
+			update();
+		}
+	</script>
+</body>
+</html>
